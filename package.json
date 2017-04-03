@@ -1,0 +1,16 @@
+{
+  "name": "gulp-modernizr-build",
+  "version": "0.0.1",
+  "description": "A gulp.js plugin to crawl your files and build the minimum features into modernizr",
+  "main": "src/index.js",
+  "license": "WTFPL",
+  "dependencies": {
+    "gulp-util": "^3.0.8",
+    "lodash.defaults": "^4.2.0",
+    "modernizr": "^3.4.0",
+    "through2": "^2.0.3"
+  },
+  "engines": {
+    "node": ">=6.9.0"
+  }
+}
