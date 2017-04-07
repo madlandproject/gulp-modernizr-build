@@ -22,19 +22,15 @@ gulp.src([
     './**/*.js',
     './**/*.css',
     '!./**/modernizr*.js']) // Don't forget to exclude any other Modernizr files you may have in your sources.
-    .pipe( modernizr({
-        file : 'modernizr.js',
-        cssPrefix   : 'feat-',
-        options : [
-            ''
-        ]
+    .pipe( modernizr('modernizr.js', {
+        cssPrefix   : 'feat-'
     })
     .pipe( uglify() ); // this plugin won't do it for  you.
 
 ```
 
 ## Config
-The plugin function accepts one options argument with the following properties :
+The plugin function accepts two parameters. The file name and a config object with the following properties:
 
 - `file`
     
@@ -47,4 +43,7 @@ The plugin function accepts one options argument with the following properties :
 
 ## Todo ##
 - Tests
+
+    * Include references to every feature in JS and CSS to check they are detected correctly
+
 - Better documentation.

@@ -4,6 +4,15 @@
   "description": "A gulp.js plugin to crawl your files and build the minimum features into modernizr",
   "main": "src/index.js",
   "license": "WTFPL",
+  "keywords": [
+    "gulpplugin",
+    "gulp",
+    "modernizr"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/madlandproject/gulp-modernizr-build.git"
+  },
   "dependencies": {
     "gulp-util": "^3.0.8",
     "lodash.defaults": "^4.2.0",

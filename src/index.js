@@ -69,7 +69,7 @@ function isCSSFile(file) {
  Gulp transform instance
 
  */
-module.exports = function (buildConfig) {
+module.exports = function (fileName, buildConfig = {}) {
 
     let outputFile;
     let detectedFeatures = [];
@@ -153,14 +153,14 @@ module.exports = function (buildConfig) {
         };
 
         gutil.log('Building Modernizr with these additional options :');
-        if (buildConfig.cssPrefix && buildConfig.cssPrefix.length > 0) {
+        if (buildConfig.cssPrefix && typeof buildConfig.cssPrefix === 'string') {
             gutil.log('CSS class prefix: ', '"' + gutil.colors.yellow(buildConfig.cssPrefix) + '"');
         }
 
         Modernizr.build(modernirConfig, (buildResult) => {
 
             outputFile = new gutil.File({
-                path: buildConfig.file,
+                path: fileName,
                 contents: new Buffer(buildResult)
             });
 
