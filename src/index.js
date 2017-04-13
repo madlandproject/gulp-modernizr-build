@@ -139,7 +139,7 @@ module.exports = function (fileName, buildConfig = {}) {
     function buildModernizr(cb) {
 
         // get path from feature
-        let featurePaths = detectedFeatures.map(feature => feature.path.replace(/\.?\/?feature-detects\/([a-z-\/]+)\.js/, "$1"));
+        let featurePaths = detectedFeatures.map(feature => feature.path.replace(/\.?\/?feature-detects\/([a-z-0-9\/]+)\.js/, "$1"));
 
         // Output start message
         gutil.log('Detected features:');
