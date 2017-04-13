@@ -40,6 +40,15 @@ The plugin function accepts two parameters. The file name and a config object wi
     
     Prefix for CSS classes applied to the `<html />` element
     
+## Contributors
+Thank you to following people for contributing to this plugin.
+
+- Danielle McLean ([@00dani](https://github.com/00dani))
+
+## Changelog
+- 0.0.3 - Bug fixes for RegExp objects (#1, #2). Updated README.
+- 0.0.2 - Removed unwanted files from NPM.
+- 0.0.1 - The plugin was born.
 
 ## Todo ##
 - Tests
