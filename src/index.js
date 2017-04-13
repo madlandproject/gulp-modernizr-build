@@ -117,7 +117,7 @@ module.exports = function (fileName, buildConfig = {}) {
 
                     featureUsed = classes.some(cssclass => {
                         let cssPropRegex;
-                        cssPropRegex = (buildConfig.cssPrefix) ? new RegExp(`html\\.(${buildConfig.cssPrefix})(no-)${cssclass}`, 'im') : new RegExp(`html\\.(no-)?${cssclass}`, 'im');
+                        cssPropRegex = (buildConfig.cssPrefix) ? new RegExp(`html\\.(${buildConfig.cssPrefix})(no-)?${cssclass}`, 'im') : new RegExp(`html\\.(no-)?${cssclass}`, 'im');
                         return cssPropRegex.test(fileContents);
                     });
 
