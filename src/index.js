@@ -9,6 +9,7 @@ const defaults = require('lodash.defaults');
 // hidden vars
 const PLUGIN_NAME = 'gulp-modernizr-build';
 
+// Store Modernizr metadata to avoid fetching it for every file
 let _metadataCache;
 
 const defaultConfig = {
@@ -35,7 +36,8 @@ const defaultConfig = {
         // "testAllProps",
         // "testProp",
         // "testStyles"
-    ]
+    ],
+    quiet : false
 };
 
 // Modernizr helpers
@@ -53,12 +55,14 @@ function getMetadata() {
 }
 
 // File helpers
+// detect JS files
 const JS_FILE_REGEX = /\.(js|coffee|ts|jsx)$/i;
 function isJsFile(file) {
     return JS_FILE_REGEX.test(file.path);
 }
 
-const CSS_FILE_REGEX = /\.(css|scss|sass)$/i;
+// Detect style files
+const CSS_FILE_REGEX = /\.(css|scss|sass|styl|less)$/i;
 function isCSSFile(file) {
     return CSS_FILE_REGEX.test(file.path);
 }
@@ -71,7 +75,6 @@ function isCSSFile(file) {
  */
 module.exports = function (fileName, buildConfig = {}) {
 
-    let outputFile;
     let detectedFeatures = [];
 
     let _featureCache = {};
@@ -94,6 +97,7 @@ module.exports = function (fileName, buildConfig = {}) {
             features.forEach(feature => {
 
                 // return early if this feature has already been detected
+                // TODO see how nested property arrays do with this
                 if (_featureCache[feature.property]) {
                     return;
                 }
@@ -102,7 +106,7 @@ module.exports = function (fileName, buildConfig = {}) {
                 let featureUsed = false;
 
                 if (isJsFile(file)) {
-                    // always treat as an array
+                    // always treat property as an array of properties
                     let properties = Array.isArray(feature.property) ? feature.property : [feature.property];
 
                     featureUsed = properties.some(property => {
@@ -113,11 +117,12 @@ module.exports = function (fileName, buildConfig = {}) {
 
                 } else if (isCSSFile(file)) {
 
+                    // always treat class an array of classes
                     let classes = Array.isArray(feature.cssclass) ? feature.cssclass : [feature.cssclass];
 
-                    featureUsed = classes.some(cssclass => {
+                    featureUsed = classes.some( cssClass => {
                         let cssPropRegex;
-                        cssPropRegex = (buildConfig.cssPrefix) ? new RegExp(`html\\.(${buildConfig.cssPrefix})(no-)?${cssclass}`, 'im') : new RegExp(`html\\.(no-)?${cssclass}`, 'im');
+                        cssPropRegex = (buildConfig.cssPrefix) ? new RegExp(`html\\.(${buildConfig.cssPrefix})(no-)?${cssClass}`, 'im') : new RegExp(`html\\.(no-)?${cssClass}`, 'im');
                         return cssPropRegex.test(fileContents);
                     });
 
@@ -142,8 +147,10 @@ module.exports = function (fileName, buildConfig = {}) {
         let featurePaths = detectedFeatures.map(feature => feature.path.replace(/\.?\/?feature-detects\/([a-z-0-9\/]+)\.js/, "$1"));
 
         // Output start message
-        gutil.log('Detected features:');
-        gutil.log(featurePaths.map(feat => gutil.colors.yellow(feat)).join(', '));
+        if ( !buildConfig.quiet ) {
+            gutil.log('Detected features:');
+            gutil.log(featurePaths.map(feat => gutil.colors.yellow(feat)).join(', '));
+        }
 
         // assemble modernizr config
         let modernirConfig = {
@@ -152,17 +159,25 @@ module.exports = function (fileName, buildConfig = {}) {
             "feature-detects": featurePaths
         };
 
-        gutil.log('Building Modernizr with these additional options :');
-        if (buildConfig.cssPrefix && typeof buildConfig.cssPrefix === 'string') {
-            gutil.log('CSS class prefix: ', '"' + gutil.colors.yellow(buildConfig.cssPrefix) + '"');
+        if ( !buildConfig.quiet ) {
+            gutil.log('Building Modernizr with these additional options :');
+            if (buildConfig.cssPrefix && typeof buildConfig.cssPrefix === 'string') {
+                gutil.log('CSS class prefix: ', '"' + gutil.colors.yellow(buildConfig.cssPrefix) + '"');
+            }
         }
 
+        // Start modernizr custom build
         Modernizr.build(modernirConfig, (buildResult) => {
 
-            outputFile = new gutil.File({
+            let outputFile = new gutil.File({
                 path: fileName,
-                contents: new Buffer(buildResult)
+                contents: new Buffer( buildResult )
             });
+
+            // used for testing
+            if (buildConfig.debug) {
+                outputFile.features = detectedFeatures;
+            }
 
             this.push(outputFile);
             cb();
