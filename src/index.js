@@ -16,6 +16,7 @@ const defaultConfig = {
     cssPrefix: null,
     file: 'modernizr.js',
     options: [
+        'setClasses', // Set classes is enabled by default
 
         /*
          For reference below : the list of options supported by Modernizr
@@ -37,7 +38,7 @@ const defaultConfig = {
         // "testProp",
         // "testStyles"
     ],
-    quiet : false
+    quiet: false
 };
 
 // Modernizr helpers
@@ -120,7 +121,7 @@ module.exports = function (fileName, buildConfig = {}) {
                     // always treat class an array of classes
                     let classes = Array.isArray(feature.cssclass) ? feature.cssclass : [feature.cssclass];
 
-                    featureUsed = classes.some( cssClass => {
+                    featureUsed = classes.some(cssClass => {
                         let cssPropRegex;
                         cssPropRegex = (buildConfig.cssPrefix) ? new RegExp(`html\\.(${buildConfig.cssPrefix})(no-)?${cssClass}`, 'im') : new RegExp(`html\\.(no-)?${cssClass}`, 'im');
                         return cssPropRegex.test(fileContents);
@@ -147,19 +148,33 @@ module.exports = function (fileName, buildConfig = {}) {
         let featurePaths = detectedFeatures.map(feature => feature.path.replace(/\.?\/?feature-detects\/([a-z-0-9\/]+)\.js/, "$1"));
 
         // Output start message
-        if ( !buildConfig.quiet ) {
+        if (!buildConfig.quiet) {
+            // log detected features
             gutil.log('Detected features:');
             gutil.log(featurePaths.map(feat => gutil.colors.yellow(feat)).join(', '));
         }
 
+        // added features if needed
+        if (buildConfig.addFeatures && typeof Array.isArray(buildConfig.addFeatures)) {
+
+            featurePaths = featurePaths.concat( buildConfig.addFeatures );
+
+            // Log if needed
+            if (!buildConfig.quiet) {
+                gutil.log('Added features :');
+                gutil.log(buildConfig.addFeatures.map(feat => gutil.colors.yellow(feat)).join(', '))
+            }
+
+        }
+
         // assemble modernizr config
-        let modernirConfig = {
+        let modernirzConfig = {
             classPrefix: buildConfig.cssPrefix,
             options: buildConfig.options,
             "feature-detects": featurePaths
         };
 
-        if ( !buildConfig.quiet ) {
+        if (!buildConfig.quiet) {
             gutil.log('Building Modernizr with these additional options :');
             if (buildConfig.cssPrefix && typeof buildConfig.cssPrefix === 'string') {
                 gutil.log('CSS class prefix: ', '"' + gutil.colors.yellow(buildConfig.cssPrefix) + '"');
@@ -167,11 +182,11 @@ module.exports = function (fileName, buildConfig = {}) {
         }
 
         // Start modernizr custom build
-        Modernizr.build(modernirConfig, (buildResult) => {
+        Modernizr.build(modernirzConfig, (buildResult) => {
 
             let outputFile = new gutil.File({
                 path: fileName,
-                contents: new Buffer( buildResult )
+                contents: new Buffer(buildResult)
             });
 
             // used for testing
