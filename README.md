@@ -41,6 +41,10 @@ The plugin function accepts two parameters: The file name and a config object wi
     
     Supress console output
     
+- `addFeatures`
+    
+    An array of feature path to manually add to the build. for example : `es6/promises`
+        
 ## Testing
 Testing is done with Mocha and Chai : 
 
@@ -50,8 +54,10 @@ Testing is done with Mocha and Chai :
 Thank you to following people for contributing to this plugin.
 
 - Danielle McLean ([@00dani](https://github.com/00dani))
+- KasperAndersson ([@KasperAndersson](https://github.com/KasperAndersson))
 
 ## Changelog
+- 0.0.5 - Updated Modernizr to v3.5. setClasses option is set to true by default. addFeatures option allows adding features manually.
 - 0.0.4 - Added LESS and Stylus file extensions for CSS detection. added quiet option. Added basic tests.
 - 0.0.3 - Bug fixes for RegExp objects (#1, #2). Updated README.
 - 0.0.2 - Removed unwanted files from NPM.
@@ -59,7 +65,6 @@ Thank you to following people for contributing to this plugin.
 
 ## Todo ##
 - Accept an `allFeatures` parameter to build every available feature detection. Useful for building dev versions of Modernizr.
-- Accept a `addFeatures` parameter to force addition of features manually
 - Add .editorconfig file & lintconfig for consistency
 - Tests
 
