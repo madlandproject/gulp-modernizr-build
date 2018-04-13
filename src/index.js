@@ -3,7 +3,11 @@
 // Imports
 const Modernizr = require('modernizr');
 const through = require('through2');
-const gutil = require('gulp-util');
+
+const log = require('fancy-log');
+const colors = require('ansi-colors');
+const File = require('vinyl');
+
 const defaults = require('lodash.defaults');
 
 // hidden vars
@@ -48,6 +52,10 @@ function getMetadata() {
             resolve(_metadataCache)
         } else {
             Modernizr.metadata((metadata) => {
+                if (!metadata) {
+                    reject( new Error("Modernizr didn't return any metadata" ) );
+                }
+
                 _metadataCache = metadata; // cache metadata
                 resolve(metadata);
             });
@@ -137,6 +145,8 @@ module.exports = function (fileName, buildConfig = {}) {
 
 
             cb();
+        }, (metadataError) => {
+            log.error('Error : ', metadataError);
         });
 
 
@@ -150,8 +160,14 @@ module.exports = function (fileName, buildConfig = {}) {
         // Output start message
         if (!buildConfig.quiet) {
             // log detected features
-            gutil.log('Detected features:');
-            gutil.log(featurePaths.map(feat => gutil.colors.yellow(feat)).join(', '));
+            log('Detected features:');
+
+            if (detectedFeatures.length === 0) {
+                log(colors.dim( colors.red('No features were detected')) );
+            } else {
+                log(featurePaths.map(feat => colors.yellow(feat)).join(', '));
+            }
+
         }
 
         // added features if needed
@@ -161,8 +177,8 @@ module.exports = function (fileName, buildConfig = {}) {
 
             // Log if needed
             if (!buildConfig.quiet) {
-                gutil.log('Added features :');
-                gutil.log(buildConfig.addFeatures.map(feat => gutil.colors.yellow(feat)).join(', '))
+                log('Added features :');
+                log(buildConfig.addFeatures.map(feat => colors.yellow(feat)).join(', '))
             }
 
         }
@@ -175,16 +191,21 @@ module.exports = function (fileName, buildConfig = {}) {
         };
 
         if (!buildConfig.quiet) {
-            gutil.log('Building Modernizr with these additional options :');
+            log('Building Modernizr with these additional options :');
+
+            // Log extra options
+            log( buildConfig.options.map( option => colors.yellow(option) ).join(', ') );
+
+            // Log CSS prefix if one has been specified
             if (buildConfig.cssPrefix && typeof buildConfig.cssPrefix === 'string') {
-                gutil.log('CSS class prefix: ', '"' + gutil.colors.yellow(buildConfig.cssPrefix) + '"');
+                log('CSS class prefix: ', '"' + colors.yellow(buildConfig.cssPrefix) + '"');
             }
+
         }
 
         // Start modernizr custom build
         Modernizr.build(modernirzConfig, (buildResult) => {
-
-            let outputFile = new gutil.File({
+            let outputFile = new File({
                 path: fileName,
                 contents: new Buffer(buildResult)
             });
@@ -192,6 +213,7 @@ module.exports = function (fileName, buildConfig = {}) {
             // used for testing
             if (buildConfig.debug) {
                 outputFile.features = detectedFeatures;
+                outputFile.config = modernirzConfig;
             }
 
             this.push(outputFile);

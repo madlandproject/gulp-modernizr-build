@@ -2,9 +2,10 @@
 
 // Import gulp to define tasks
 const gulp = require('gulp');
-const gutil = require('gulp-util');
 const gdebug = require('gulp-debug');
 const through = require('through2');
+
+const capcon = require('capture-console');
 
 // Import testing tools
 const mocha = require('mocha');
@@ -47,8 +48,8 @@ describe('Loading plugin', function() {
 
     it('Should return a transform stream', function()  {
         const transform = modernizr('test.js');
-        expect( transform.read ).to.be.a.function;
-        expect( transform.write ).to.be.a.function;
+        expect( transform.read ).to.be.a('function');
+        expect( transform.write ).to.be.a('function');
     });
 
 });
@@ -128,5 +129,81 @@ describe('Simple JS detection', function () {
             }));
 
     });
+
+});
+
+
+describe('Output options', function() {
+
+    let output = '';
+
+    it('Should NOT display output with quiet option set to true', function(done) {
+
+        // redirect console to our variable
+        capcon.startIntercept( process.stdout, (stdout) => {
+            output += stdout;
+        });
+
+        this.slow(BUILD_TIME);
+        const testName = 'testfilename.js';
+        gulp.src( `${__dirname}/mock-src/js/no-features.js` )
+            .pipe( modernizr( testName, {debug: true, options: ['setClasses', 'html5shiv'], quiet: true} ) )
+            .pipe( through.obj(null, (file) => {
+                capcon.stopIntercept(process.stdout);
+
+                expect( output ).to.have.lengthOf(0);
+                output = '';
+
+                done();
+            }));
+
+    });
+
+    it('Should display output with quiet option set to false', function(done) {
+
+        // redirect console to our variable
+        capcon.startIntercept( process.stdout, (stdout) => {
+            output += stdout;
+        });
+
+        this.slow(BUILD_TIME);
+        const testName = 'testfilename.js';
+        gulp.src( `${__dirname}/mock-src/js/no-features.js` )
+            .pipe( modernizr( testName, {debug: true, options: ['setClasses', 'html5shiv'], quiet: false} ) )
+            .pipe( through.obj(null, (file) => {
+                capcon.stopIntercept(process.stdout);
+
+                expect( output ).to.have.lengthOf.above(0);
+                output = '';
+
+                done();
+            }));
+
+    });
+
+    it('Should warn user nothing was detected', function(done) {
+
+        // redirect console to our variable
+        capcon.startIntercept( process.stdout, (stdout) => {
+            output += stdout;
+        });
+
+        this.slow(BUILD_TIME);
+        const testName = 'testfilename.js';
+        gulp.src( `${__dirname}/mock-src/js/no-features.js` )
+            .pipe( modernizr( testName, {debug: true, options: ['setClasses', 'html5shiv'], quiet: false} ) )
+            .pipe( through.obj(null, (file) => {
+                capcon.stopIntercept(process.stdout);
+
+                expect( file.features ).to.have.lengthOf(0);
+                expect( output ).to.include('No features were detected');
+
+                output = '';
+
+                done();
+            }));
+
+    });
+
 
 });

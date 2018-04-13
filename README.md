@@ -57,11 +57,12 @@ Thank you to following people for contributing to this plugin.
 - KasperAndersson ([@KasperAndersson](https://github.com/KasperAndersson))
 
 ## Changelog
-- 0.0.5 - Updated Modernizr to v3.5. setClasses option is set to true by default. addFeatures option allows adding features manually.
-- 0.0.4 - Added LESS and Stylus file extensions for CSS detection. added quiet option. Added basic tests.
-- 0.0.3 - Bug fixes for RegExp objects (#1, #2). Updated README.
-- 0.0.2 - Removed unwanted files from NPM.
-- 0.0.1 - The plugin was born.
+- **0.0.6** - Updated Modernizr to v3.6. Updated Chai to version 4. Removed gulp-util dependency per the gulp team recommendation for Gulp 4. Added warning when no features are detected. Now Logs all additional options. Added tests for console output. Handled possible unhandled Promise rejection.
+- **0.0.5** - Updated Modernizr to v3.5. setClasses option is set to true by default. addFeatures option allows adding features manually.
+- **0.0.4** - Added LESS and Stylus file extensions for CSS detection. added quiet option. Added basic tests.
+- **0.0.3** - Bug fixes for RegExp objects (#1, #2). Updated README.
+- **0.0.2** - Removed unwanted files from NPM.
+- **0.0.1** - The plugin was born.
 
 ## Todo ##
 - Accept an `allFeatures` parameter to build every available feature detection. Useful for building dev versions of Modernizr.
